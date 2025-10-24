@@ -1,25 +1,25 @@
-const fs = require('fs');
-const dotenv = require('dotenv');
-const mongoose = require('mongoose');
-const Tour = require('./../models/tourModel');
+const fs = require("fs");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const Tour = require("./../models/tourModel");
 
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: "./config.env" });
 
 const DB = process.env.DATABASE.replace(
-  '<db_password>',
+  "<db_password>",
   process.env.DB_PASSWORD
-).replace('<db_username>', process.env.DB_USERNAME);
+).replace("<db_username>", process.env.DB_USERNAME);
 
-mongoose.connect(DB).then(() => console.log('DB connection successful!'));
+mongoose.connect(DB).then(() => console.log("DB connection successful!"));
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/data/tours-simple.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/data/tours.json`, "utf-8")
 );
 
 const importData = async () => {
   try {
     await Tour.create(tours);
-    console.log('Data successfully loaded!');
+    console.log("Data successfully loaded!");
   } catch (err) {
     console.log(err);
   }

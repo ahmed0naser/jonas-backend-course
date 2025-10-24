@@ -1,29 +1,29 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const tourschema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'a tour must have a name'],
+      required: [true, "a tour must have a name"],
       unique: true,
       trim: true,
     },
     duration: {
       type: Number,
-      required: [true, 'a tour must have a duration'],
+      required: [true, "a tour must have a duration"],
     },
     maxGroupSize: {
       type: Number,
-      required: [true, 'a tour must have a group size'],
+      required: [true, "a tour must have a group size"],
     },
     difficulty: {
       type: String,
-      required: [true, 'a tour must have a difficulty'],
+      required: [true, "a tour must have a difficulty"],
     },
 
     price: {
       type: Number,
-      required: [true, 'a tour must have a price'],
+      required: [true, "a tour must have a price"],
     },
 
     priceDiscount: Number,
@@ -31,13 +31,13 @@ const tourschema = new mongoose.Schema(
     summary: {
       type: String,
       trim: true,
-      required: [true, 'a tour must have summary'],
+      required: [true, "a tour must have summary"],
     },
-    ratingQuantity: {
+    ratingsQuantity: {
       type: Number,
       default: 0,
     },
-    ratingAverage: {
+    ratingsAverage: {
       type: Number,
       default: 4.5,
     },
@@ -45,7 +45,7 @@ const tourschema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    imgCover: {
+    imageCover: {
       type: String,
     },
     images: [String],
@@ -54,13 +54,38 @@ const tourschema = new mongoose.Schema(
       default: Date.now(),
     },
     startDates: [Date],
+    //NOTE THIS OBJECT IS EMBEDED NOT schema type
+    startLocation: {
+      //mongoose have GeoJSON for geosaptial data
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
-tourschema.virtual('weeks').get(function () {
+tourschema.virtual("weeks").get(function () {
   return this.duration / 7;
 });
 ////doc middleware
@@ -87,5 +112,5 @@ tourschema.virtual('weeks').get(function () {
 // });
 
 ////aggregation middleware (hooks)pre post('aggregate',()=>{this===current agg object})don't forget next()
-const Tour = mongoose.model('Tour', tourschema);
+const Tour = mongoose.model("Tour", tourschema);
 module.exports = Tour;
