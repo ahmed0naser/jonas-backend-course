@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+// const User = require("./userModel");
 
 const tourschema = new mongoose.Schema(
   {
@@ -79,6 +80,13 @@ const tourschema = new mongoose.Schema(
         day: Number,
       },
     ],
+    // guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -98,7 +106,21 @@ tourschema.virtual("weeks").get(function () {
 
 //   next();
 // })
+//////////////
+//embedding users into tours
+// tourschema.pre("save", async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });///////////////////
 /////////query middleware
+tourschema.pre(/^find/, async function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
+  next();
+});
 ///if you want it to work on diffrent same queries(find/findOne) use reqex instead of only 'find'
 // tourschema.pre('find', function (next) {
 //   ///this is gonna be pointing on the queryobject so it can be chained
