@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
-    review: { String, required: [true, `review can't be empty`] },
-    ratings: { Number, min: 1, max: 5 },
-    createdAt: { Date, default: Date.now },
+    review: { type: String, required: [true, `review can't be empty`] },
+    ratings: { type: Number, min: 1, max: 5 },
+    createdAt: { type: Date, default: Date.now },
     tour: {
       type: mongoose.Schema.ObjectId,
       ref: "Tour",
@@ -21,6 +21,13 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+reviewSchema.pre(/^find/, async function (next) {
+  this.populate({ path: "tour", select: "name" }).populate({
+    path: "user",
+    select: "name photo",
+  });
+  next();
+});
 
 const Review = mongoose.model("Review", reviewSchema);
 module.exports = Review;
