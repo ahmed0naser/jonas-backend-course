@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 // const User = require("./userModel");
+const slugify = require("slugify");
 
 const tourschema = new mongoose.Schema(
   {
@@ -9,6 +10,7 @@ const tourschema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, "a tour must have a duration"],
@@ -41,6 +43,7 @@ const tourschema = new mongoose.Schema(
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      set: (val) => Math.round(val * 10) / 10,
     },
     description: {
       type: String,
@@ -96,6 +99,10 @@ const tourschema = new mongoose.Schema(
 tourschema.virtual("weeks").get(function () {
   return this.duration / 7;
 });
+
+tourschema.index({ price: 1, ratingsAverage: -1 });
+tourschema.index({ slug: 1 });
+tourschema.index({ startLocation: "2dsphere" });
 //virtual populate
 tourschema.virtual("reviews", {
   ref: "Review", //the refrence model that we want the data rfom
@@ -119,6 +126,10 @@ tourschema.virtual("reviews", {
 //   this.guides = await Promise.all(guidesPromises);
 //   next();
 // });///////////////////
+tourschema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 /////////query middleware
 tourschema.pre(/^find/, async function (next) {
   this.populate({
