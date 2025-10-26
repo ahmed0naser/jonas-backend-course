@@ -96,6 +96,12 @@ const tourschema = new mongoose.Schema(
 tourschema.virtual("weeks").get(function () {
   return this.duration / 7;
 });
+//virtual populate
+tourschema.virtual("reviews", {
+  ref: "Review", //the refrence model that we want the data rfom
+  foreignField: "tour", //refence the fields connects with this model(tour) with the review model(the field in the review model called tour)
+  localField: "_id", //where is the refrence stored in the current model(meand _id is what the review refrence the tour its connected with by)
+});
 ////doc middleware
 // tourschema.pre('save',function(next){///this is pointing on the document that will be saved
 

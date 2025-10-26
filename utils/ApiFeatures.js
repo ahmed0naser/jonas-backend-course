@@ -4,8 +4,8 @@ class ApiFeatures {
     this.queryString = queryString;
   }
   filter() {
-    const queryCopy = { ...this.queryStringy };
-    const excl = ['page', 'limit', 'sort', 'fields'];
+    const queryCopy = { ...this.queryString };
+    const excl = ["page", "limit", "sort", "fields"];
     excl.forEach((el) => delete queryCopy[el]);
     let q = JSON.stringify(queryCopy);
     q = q.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
@@ -15,19 +15,19 @@ class ApiFeatures {
   }
   sort() {
     if (this.queryString.sort) {
-      const sortby = this.queryString.sort.split(',').join(' ');
+      const sortby = this.queryString.sort.split(",").join(" ");
       this.query = this.query.sort(sortby);
     } else {
-      this.query = this.query.sort('-createdAt');
+      this.query = this.query.sort("-createdAt");
     }
     return this;
   }
   limitfields() {
     if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
+      const fields = this.queryString.fields.split(",").join(" ");
       this.query = this.query.select(fields);
     } else {
-      this.query = this.query.select('-__v');
+      this.query = this.query.select("-__v");
     }
     return this;
   }

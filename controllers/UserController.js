@@ -1,7 +1,8 @@
-const User = require('./../models/userModel');
-const ApiFeatures = require('./../utils/ApiFeatures');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/AppError');
+const User = require("./../models/userModel");
+const ApiFeatures = require("./../utils/ApiFeatures");
+const catchAsync = require("./../utils/catchAsync");
+const AppError = require("./../utils/AppError");
+const factory = require("./handlerFactory");
 const filterObj = (obj, ...fields) => {
   const newobj = {};
   Object.keys(obj).forEach((el) => {
@@ -11,33 +12,27 @@ const filterObj = (obj, ...fields) => {
   });
   return newobj;
 };
-exports.getusers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'this route can not update password use /updateMyPassword',
+        "this route can not update password use /updateMyPassword",
         400
       )
     );
   }
-  const body = filterObj(req.body, 'name', 'email');
+  const body = filterObj(req.body, "name", "email");
   const updateduser = await User.findByIdAndUpdate(req.user.id, body, {
     new: true,
     runValidators: true,
   });
   res.status(200).json({
-    status: 'success',
+    status: "success",
     user: updateduser,
   });
 });
@@ -45,34 +40,20 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).json({
-    status: 'success',
+    status: "success",
     data: null,
   });
 });
 
 exports.createusers = (req, res) => {
   res.status(500).json({
-    message: 'route not defined',
-  });
-};
-exports.getuser = (req, res) => {
-  res.status(500).json({
-    message: 'route not defined',
-  });
-};
-exports.createuser = (req, res) => {
-  res.status(500).json({
-    message: 'route not defined',
-  });
-};
-exports.updateuser = (req, res) => {
-  res.status(500).json({
-    message: 'route not defined',
+    message: "route not defined, please use signUp",
   });
 };
 
-exports.delereuser = (req, res) => {
-  res.status(500).json({
-    message: 'route not defined',
-  });
-};
+exports.getusers = factory.getAll(User);
+exports.getuser = factory.getOne(User);
+
+exports.updateuser = factory.updateOne(User);
+
+exports.deleteuser = factory.deleteOne(User);
